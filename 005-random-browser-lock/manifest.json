@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Random Browser Lock",
+  "version": "0.1.0",
+  "description": "Blocks distracting websites for a randomly selected amount of time.",
+  "permissions": [
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "blocker.js"
+      ]
+    }
+  ]
+}
