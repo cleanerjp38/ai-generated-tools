@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NISA積立シミュレーター</title>
+    <style>
+    body {
+        font-family: sans-serif;
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 16px;
+    }
+
+    input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        margin-top: 5px;
+        font-size: 16px;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    #result {
+        margin-top: 30px;
+        padding: 20px;
+        background-color: white;
+        border-radius: 8px;
+    }
+
+    #total {
+        font-weight: bold;
+        font-size: 20px;
+    }
+</style>
+</head>
+<body>
+    <h1>NISA積立シミュレーター</h1>
+
+    <label>
+        毎月の積立額（円）
+        <input type="number" id="monthly" value="30000">
+    </label>
+
+
+
+    <label>
+        想定年利（%）
+        <input type="number" id="rate" value="5">
+    </label>
+
+
+    <label>
+        積立年数
+        <input type="number" id="years" value="20">
+    </label>
+
+
+
+    <button id="calculate">計算する</button>
+    <div id="result">
+        <h2>計算結果</h2>
+        <p>元本：<span id="principal">-</span> 円</p>
+        <p>運用益：<span id="profit">-</span> 円</p>
+    <p>最終金額：<span id="total">-</span> 円</p>
+</div>
+<script>
+    const button = document.getElementById("calculate");
+
+    button.addEventListener("click", function () {
+        const monthly = Number(document.getElementById("monthly").value);
+        const annualRate = Number(document.getElementById("rate").value);
+        const years = Number(document.getElementById("years").value);
+
+        const months = years * 12;
+        const monthlyRate = annualRate / 100 / 12;
+
+        const principal = monthly * months;
+
+        let total;
+
+        if (monthlyRate === 0) {
+            total = principal;
+        } else {
+            total =
+                monthly *
+                ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+        }
+
+        const profit = total - principal;
+
+        document.getElementById("principal").textContent =
+            Math.round(principal).toLocaleString();
+
+        document.getElementById("profit").textContent =
+            Math.round(profit).toLocaleString();
+
+        document.getElementById("total").textContent =
+            Math.round(total).toLocaleString();
+    });
+</script>
+</body>
+</html>
