@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全肯定犬</title>
+
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            background-color: #fff8e7;
+            padding-top: 80px;
+        }
+
+        .dog {
+            font-size: 100px;
+        }
+
+        #message {
+            font-size: 22px;
+            margin: 30px;
+            min-height: 60px;
+        }
+
+        button {
+            font-size: 20px;
+            padding: 12px 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dog">🐶</div>
+
+    <div id="message">
+        今日はどうしたワン？
+    </div>
+
+    <button id="comfortButton">
+        なぐさめてもらう
+    </button>
+
+    <script>
+        const messages = [
+            "今日はしんどかったんだな。よく帰ってきたワン",
+            "元気が出ない日は、元気が出ないままでいいワン",
+            "今日も生きてる！ もうそれで合格だワン！",
+            "失敗した？ でも明日があるワン！",
+            "お前、けっこう頑張ってるの知ってるワン",
+            "今日は最低限で閉店していいワン",
+            "うまいもの食って寝るワン！",
+            "10分だけやった？ えらすぎるワン！",
+            "何もしたくない？ じゃあ犬を撫でるワン",
+            "大丈夫。今日は犬が味方だワン"
+        ];
+
+        const button = document.getElementById("comfortButton");
+        const message = document.getElementById("message");
+
+        button.addEventListener("click", () => {
+            const randomIndex = Math.floor(Math.random() * messages.length);
+            message.textContent = messages[randomIndex];
+        });
+    </script>
+
+</body>
+</html>
