@@ -1,0 +1,53 @@
+[
+  {
+    "id": "001",
+    "name": "YouTube Randomizer",
+    "type": "extension",
+    "path": "../001-youtube-randomizer",
+    "url": "https://www.youtube.com/"
+  },
+  {
+    "id": "002",
+    "name": "Steam Randomizer",
+    "type": "python",
+    "path": "../002-steam-randomizer/main.py"
+  },
+  {
+    "id": "003",
+    "name": "YouTube Transcript",
+    "type": "python",
+    "path": "../003-youtube-transcript/main.py",
+    "argument": "YouTube URL"
+  },
+  {
+    "id": "004",
+    "name": "Dice Roller",
+    "type": "python",
+    "path": "../004-dice-roller/main.py"
+  },
+  {
+    "id": "005",
+    "name": "Random Browser Lock",
+    "type": "extension",
+    "path": "../005-random-browser-lock",
+    "url": "https://www.google.com/"
+  },
+  {
+    "id": "006",
+    "name": "NISA Simulator",
+    "type": "html",
+    "path": "../006-nisa-simulator/index.html"
+  },
+  {
+    "id": "007",
+    "name": "News Randomizer",
+    "type": "python",
+    "path": "../007-news-randomizer/main.py"
+  },
+  {
+    "id": "008",
+    "name": "Comfort Dog",
+    "type": "html",
+    "path": "../008-comfort-dog/index.html"
+  }
+]
