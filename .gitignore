@@ -18,3 +18,5 @@ Desktop.ini
 
 # VS Code local settings
 .vscode/
+
+011-gpu-price-watcher/prices.json
