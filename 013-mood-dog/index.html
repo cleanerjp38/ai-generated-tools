@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mood Dog</title>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #fff8e7;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .dog {
+      font-size: 80px;
+      margin: 20px 0;
+    }
+
+    .mood-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 25px 0;
+    }
+
+    button {
+      font-size: 16px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #f0e0bd;
+    }
+
+    button:hover {
+      background: #e5cf9f;
+    }
+
+    #message {
+      min-height: 60px;
+      margin: 25px 0;
+      padding: 20px;
+      background: #fff8e7;
+      border-radius: 12px;
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    #againButton {
+      display: none;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🐕 Mood Dog</h1>
+    <p>いまの気分を教えてほしいワン。</p>
+
+    <div class="dog">🐶</div>
+
+    <div class="mood-buttons">
+      <button onclick="selectMood('tired')">😫 疲れた</button>
+      <button onclick="selectMood('anxious')">😟 不安</button>
+      <button onclick="selectMood('angry')">😠 イライラ</button>
+      <button onclick="selectMood('study')">💻 勉強・開発疲れ</button>
+    </div>
+
+    <div id="message">
+      気分を選んでほしいワン！
+    </div>
+
+    <button id="againButton" onclick="showMessage()">
+      🐾 もう一言
+    </button>
+  </div>
+
+  <script>
+    const messages = {
+    tired: [
+        "今日もここまでよく動いたワン。休むのも大事な仕事だワン。",
+        "疲れたってことは、それだけ今日を使ったってことだワン。",
+        "今日は省エネモードでもいいワン。犬だってずっと走ってはいないワン。",
+        "もう十分やったなら、今日は店じまいしていいワン。",
+        "疲れている時に無理して頑張っても、犬なら寝るワン。",
+        "今日できなかったことは、明日の自分に渡していいワン。",
+        "ちょっと座って、水でも飲むワン。急がなくていいワン。",
+        "元気がない日は、最低限できれば上出来だワン。",
+        "今日は頑張る日じゃなくて、回復する日かもしれないワン。",
+        "疲れた自分にも優しくしてほしいワン。今日もお疲れさまだワン。"
+    ],
+
+    anxious: [
+        "先のことを全部いま決めなくても大丈夫だワン。",
+        "不安があっても、今日できることを一個やれば十分だワン。",
+        "まだ起きていないことまで、一人で背負わなくていいワン。",
+        "今わからないことは、今わからないままでもいいワン。",
+        "不安な時ほど、未来が全部悪く見えることもあるワン。",
+        "今日は今日のぶんだけ考えるワン。明日のことは明日考えるワン。",
+        "答えが出ないなら、いったん保留にしてもいいワン。",
+        "不安が消えてから動かなくてもいいワン。不安と一緒に一歩でもいいワン。",
+        "考えすぎて疲れたら、一度別のことをしてもいいワン。",
+        "大丈夫かどうかまだ分からなくても、今ここで犬と休めるワン。"
+    ],
+
+    angry: [
+        "イライラする日もあるワン。まずは犬と一緒にちょっと離れるワン。",
+        "怒っている自分を、すぐに直そうとしなくてもいいワン。",
+        "今日は気に入らないことがあったワンな。犬はここにいるワン。",
+        "今すぐ結論を出さなくてもいいワン。少し時間を置くワン。",
+        "腹が立つものは腹が立つワン。そういう日もあるワン。",
+        "言い返したいことは、頭の中で犬に聞かせてもいいワン。",
+        "怒っている時に全部決めなくていいワン。明日の自分にも相談するワン。",
+        "いったん水を飲んで、場所を変えてみるワン。",
+        "今日は相手のことを理解しなくてもいいワン。距離を取るのもありだワン。",
+        "怒りが少し静かになるまで、犬と別のことをするワン。"
+    ],
+
+    study: [
+        "1行でも進めば、昨日とは違う場所にいるワン。",
+        "わからないところが出てきたのは、ちゃんと前に進んだからだワン。",
+        "今日は小さく進めば勝ちだワン。続きは明日の犬に任せてもいいワン。",
+        "全部理解してから進まなくてもいいワン。作りながら覚えるワン。",
+        "10分やったなら、今日は10分ぶん積み上がったワン。",
+        "エラーが出たなら、少なくともプログラムを動かすところまでは来たワン。",
+        "昨日できなかったことが今日少し分かったなら、それは進歩だワン。",
+        "難しいところで止まるのは普通だワン。簡単なところに戻ってもいいワン。",
+        "今日はコードを1行読んだだけでも、ゼロではないワン。",
+        "完成しなくても、試したことは残るワン。今日も一歩進んだワン。"
+    ]
+    };
+    let currentMood = null;
+
+    function selectMood(mood) {
+      currentMood = mood;
+      showMessage();
+
+      document.getElementById("againButton").style.display = "block";
+    }
+
+    function showMessage() {
+      if (currentMood === null) {
+        return;
+      }
+
+      const moodMessages = messages[currentMood];
+      const randomIndex = Math.floor(Math.random() * moodMessages.length);
+
+      document.getElementById("message").textContent =
+        moodMessages[randomIndex];
+    }
+  </script>
+</body>
+</html>
