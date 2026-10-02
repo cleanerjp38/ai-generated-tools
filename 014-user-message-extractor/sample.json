@@ -1,0 +1,22 @@
+[
+  {
+    "role": "user",
+    "text": "今日は風邪気味だワン。"
+  },
+  {
+    "role": "assistant",
+    "text": "無理せずサクッと進めましょう。"
+  },
+  {
+    "role": "user",
+    "text": "でもAI生成ツールを1個作りたい。"
+  },
+  {
+    "role": "assistant",
+    "text": "User Message Extractorを作りましょう。"
+  },
+  {
+    "role": "user",
+    "text": "完成したらGitHubにpushするワン。"
+  }
+]
