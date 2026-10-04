@@ -1,0 +1,26 @@
+[
+  {
+    "role": "user",
+    "text": "今日は何を作る？"
+  },
+  {
+    "role": "assistant",
+    "text": "Assistant Message Extractorを作りましょう。"
+  },
+  {
+    "role": "user",
+    "text": "難しい？"
+  },
+  {
+    "role": "assistant",
+    "text": "014を流用できるので簡単です。"
+  },
+  {
+    "role": "user",
+    "text": "じゃあ作るぞ！"
+  },
+  {
+    "role": "assistant",
+    "text": "いきましょう！"
+  }
+]
