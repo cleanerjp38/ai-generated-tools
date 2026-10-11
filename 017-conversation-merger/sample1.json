@@ -1,0 +1,5 @@
+[
+  {"role": "user", "text": "今日はRustを勉強した"},
+  {"role": "assistant", "text": "いいね！"},
+  {"role": "user", "text": "明日も頑張ろう"}
+]
