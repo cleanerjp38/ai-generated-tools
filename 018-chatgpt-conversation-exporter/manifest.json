@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "ChatGPT Conversation Exporter",
+  "version": "1.0.0",
+  "description": "Export the current ChatGPT conversation as JSON.",
+  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
