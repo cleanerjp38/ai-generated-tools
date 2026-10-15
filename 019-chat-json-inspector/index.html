@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chat JSON Inspector</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background: #f5f6fa;
+      color: #222;
+    }
+    h1 { margin-bottom: 8px; }
+    .description { color: #666; }
+    .panel {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      margin-top: 20px;
+      box-shadow: 0 2px 8px #0001;
+    }
+    input { max-width: 100%; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .stat {
+      background: #f0f3f8;
+      padding: 16px;
+      border-radius: 8px;
+    }
+    .stat strong {
+      display: block;
+      font-size: 28px;
+      margin-top: 6px;
+    }
+    .success { color: #16803c; }
+    .error { color: #c62828; }
+    li { margin: 6px 0; overflow-wrap: anywhere; }
+    #result { display: none; }
+  </style>
+</head>
+<body>
+
+  <h1>Chat JSON Inspector</h1>
+  <p class="description">
+    ChatGPTの会話JSONを読み込み、内容を検査します。
+    ファイルは外部に送信されません。
+  </p>
+
+  <div class="panel">
+    <label for="fileInput">JSONファイルを選択</label>
+    <p>
+      <input type="file" id="fileInput" accept=".json,application/json">
+    </p>
+  </div>
+
+  <div class="panel" id="result">
+    <h2>検査結果</h2>
+    <p id="filename"></p>
+    <p id="status"></p>
+
+    <div class="stats">
+      <div class="stat">全発言数<strong id="total">0</strong></div>
+      <div class="stat">ユーザー<strong id="users">0</strong></div>
+      <div class="stat">GPT<strong id="assistants">0</strong></div>
+      <div class="stat">合計文字数<strong id="characters">0</strong></div>
+      <div class="stat">空欄の発言<strong id="empty">0</strong></div>
+      <div class="stat">形式エラー<strong id="errors">0</strong></div>
+    </div>
+
+    <h3>詳細</h3>
+    <ul id="details"></ul>
+  </div>
+
+<script>
+const fileInput = document.getElementById("fileInput");
+const result = document.getElementById("result");
+
+fileInput.addEventListener("change", async () => {
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  result.style.display = "block";
+
+  const filename = document.getElementById("filename");
+  const status = document.getElementById("status");
+  const details = document.getElementById("details");
+
+  filename.textContent = `ファイル: ${file.name}`;
+  details.replaceChildren();
+
+  const ids = [
+    "total", "users", "assistants",
+    "characters", "empty", "errors"
+  ];
+
+  for (const id of ids) {
+    document.getElementById(id).textContent = "0";
+  }
+
+  function addDetail(message) {
+    const li = document.createElement("li");
+    li.textContent = message;
+    details.appendChild(li);
+  }
+
+  function fail(message) {
+    status.textContent = "検査失敗";
+    status.className = "error";
+    addDetail(message);
+  }
+
+  try {
+    const content = await file.text();
+    const data = JSON.parse(content);
+
+    if (!Array.isArray(data)) {
+      fail("最上位のデータは配列 [...] である必要があります。");
+      return;
+    }
+
+    let users = 0;
+    let assistants = 0;
+    let characters = 0;
+    let empty = 0;
+    let errors = 0;
+
+    data.forEach((message, index) => {
+      const number = index + 1;
+
+      if (
+        message === null ||
+        typeof message !== "object" ||
+        Array.isArray(message)
+      ) {
+        errors++;
+        addDetail(`${number}件目: オブジェクトではありません。`);
+        return;
+      }
+
+      if (message.role === "user") {
+        users++;
+      } else if (message.role === "assistant") {
+        assistants++;
+      } else {
+        errors++;
+        addDetail(`${number}件目: roleが不正です。`);
+      }
+
+      if (typeof message.text !== "string") {
+        errors++;
+        addDetail(`${number}件目: textが文字列ではありません。`);
+      } else {
+        characters += Array.from(message.text).length;
+
+        if (message.text.trim() === "") {
+          empty++;
+          addDetail(`${number}件目: 発言が空欄です。`);
+        }
+      }
+    });
+
+    const values = {
+      total: data.length,
+      users,
+      assistants,
+      characters,
+      empty,
+      errors
+    };
+
+    for (const [id, value] of Object.entries(values)) {
+      document.getElementById(id).textContent =
+        value.toLocaleString("ja-JP");
+    }
+
+    if (errors === 0 && empty === 0) {
+      status.textContent = "検査OK：基本形式に問題はありません。";
+      status.className = "success";
+      addDetail("形式エラー・空欄は見つかりませんでした。");
+    } else {
+      status.textContent = "注意：問題が見つかりました。";
+      status.className = "error";
+    }
+
+    if (data.length === 0) {
+      addDetail("配列は空です。発言がありません。");
+    }
+
+  } catch (error) {
+    fail(`JSONの読み込みに失敗しました: ${error.message}`);
+  }
+});
+</script>
+
+</body>
+</html>
