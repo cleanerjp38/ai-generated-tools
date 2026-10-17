@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>異世界選択冒険</title>
+<style>
+  :root {
+    color-scheme: dark;
+    font-family: system-ui, sans-serif;
+  }
+  body {
+    background: #141c28;
+    color: #f1eadb;
+    margin: 0;
+    padding: 24px;
+    display: grid;
+    min-height: 90vh;
+    place-items: center;
+  }
+  main {
+    width: min(100%, 580px);
+    background: #202d3d;
+    border: 1px solid #52627a;
+    border-radius: 18px;
+    padding: 24px;
+    box-sizing: border-box;
+  }
+  h1 { color: #f4d58d; margin-top: 0; }
+  #stats { color: #a9e7bb; font-weight: bold; }
+  #story { line-height: 1.9; white-space: pre-line; }
+  button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    border: 1px solid #667d9c;
+    border-radius: 9px;
+    background: #344a64;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: left;
+  }
+  button:hover { background: #496789; }
+  button:focus-visible { outline: 3px solid #f4d58d; }
+  #restart { background: #72533c; text-align: center; }
+  .hidden { display: none; }
+  #message { color: #f4d58d; min-height: 1.5em; }
+</style>
+</head>
+<body>
+<main>
+  <h1>⚔️ 異世界選択冒険</h1>
+  <p id="stats"></p>
+  <h2 id="scene-title"></h2>
+  <p id="story"></p>
+  <p id="message" aria-live="polite"></p>
+  <div id="choices"></div>
+  <button id="restart" class="hidden">🔄 最初から冒険する</button>
+</main>
+
+<script>
+"use strict";
+
+// シナリオデータ。各選択肢は次の場面を指定する。
+const scenes = {
+  start: {
+    title: "第1章：異世界への目覚め",
+    text: "目を覚ますと、そこは見知らぬ森だった。\n手元には古びた木の棒が一本。\n遠くから悲鳴が聞こえてくる。",
+    choices: [
+      { text: "悲鳴の方向へ走る", next: "wolf", hp: -2 },
+      { text: "慎重に森を調べる", next: "herb", hp: 0 }
+    ]
+  },
+  wolf: {
+    title: "第2章：森の魔物",
+    text: "少女が狼の魔物に追われている！\n木の棒を握りしめた。",
+    choices: [
+      { text: "狼に立ち向かう", next: "village", hp: -4 },
+      { text: "少女を連れて逃げる", next: "village", hp: -2 }
+    ]
+  },
+  herb: {
+    title: "第2章：不思議な薬草",
+    text: "木陰に青く輝く薬草を見つけた。\nその向こうには小さな村が見える。",
+    choices: [
+      { text: "薬草を使って回復する", next: "village", hp: 3 },
+      { text: "薬草を無視して村へ向かう", next: "village", hp: 0 }
+    ]
+  },
+  village: {
+    title: "第3章：冒険者の村",
+    text: "村の長老が語る。\n『古い神殿に魔物が住み着いた。どうか助けてほしい』",
+    choices: [
+      { text: "神殿へ向かう", next: "temple", hp: -2 },
+      { text: "村で平穏に暮らす", next: "peace", hp: 0 }
+    ]
+  },
+  temple: {
+    title: "最終章：神殿の守護者",
+    text: "巨大な石像が動き出した！\n石像の胸には赤く光る宝石がある。",
+    choices: [
+      { text: "正面から攻撃する", next: "battle", hp: -5 },
+      { text: "宝石を狙って棒を投げる", next: "hero", hp: -3 }
+    ]
+  },
+  battle: {
+    title: "エンディング：傷だらけの勝利",
+    text: "激闘の末、石像は崩れ落ちた。\n村へ戻ったあなたは勇者として迎えられた。",
+    ending: true
+  },
+  hero: {
+    title: "エンディング：知恵ある冒険者",
+    text: "木の棒が宝石を砕いた！\n石像は停止し、神殿に平和が戻った。\nあなたの冒険は伝説となった。",
+    ending: true
+  },
+  peace: {
+    title: "エンディング：村の住人",
+    text: "あなたは冒険よりも穏やかな生活を選んだ。\n畑を耕し、村人と笑い合う日々。\nこれもまた、ひとつの異世界人生だ。",
+    ending: true
+  }
+};
+
+const MAX_HP = 10;
+let hp = MAX_HP;
+let currentScene = "start";
+let finished = false;
+
+const stats = document.querySelector("#stats");
+const title = document.querySelector("#scene-title");
+const story = document.querySelector("#story");
+const message = document.querySelector("#message");
+const choices = document.querySelector("#choices");
+const restart = document.querySelector("#restart");
+
+function render() {
+  const scene = scenes[currentScene];
+
+  stats.textContent = `❤️ HP：${hp} / ${MAX_HP}`;
+  title.textContent = scene.title;
+  story.textContent = scene.text;
+  choices.replaceChildren();
+  restart.classList.add("hidden");
+
+  if (finished) {
+    restart.classList.remove("hidden");
+    return;
+  }
+
+  if (scene.ending) {
+    finished = true;
+    message.textContent = "🎉 冒険終了！";
+    restart.classList.remove("hidden");
+    return;
+  }
+
+  for (const choice of scene.choices) {
+    const button = document.createElement("button");
+    button.textContent = choice.text;
+    button.addEventListener("click", () => choose(choice));
+    choices.appendChild(button);
+  }
+}
+
+function choose(choice) {
+  if (finished) return;
+
+  const oldHp = hp;
+  hp = Math.max(0, Math.min(MAX_HP, hp + choice.hp));
+
+  if (hp === 0) {
+    finished = true;
+    title.textContent = "💀 ゲームオーバー";
+    story.textContent = "力尽きてしまった……。\nあなたの冒険はここで終わる。";
+    message.textContent = `HP：${oldHp} → 0`;
+    stats.textContent = `❤️ HP：0 / ${MAX_HP}`;
+    choices.replaceChildren();
+    restart.classList.remove("hidden");
+    return;
+  }
+
+  message.textContent =
+    choice.hp > 0 ? `❤️ HPが${choice.hp}回復した！` :
+    choice.hp < 0 ? `💥 HPが${-choice.hp}減少した！` :
+    "物語が進んだ。";
+
+  currentScene = choice.next;
+  render();
+}
+
+restart.addEventListener("click", () => {
+  hp = MAX_HP;
+  currentScene = "start";
+  finished = false;
+  message.textContent = "";
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
