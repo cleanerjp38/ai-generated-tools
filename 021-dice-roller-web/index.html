@@ -1,0 +1,347 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dice Roller</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #151923;
+      color: #f1f5f9;
+      font-family: system-ui, sans-serif;
+    }
+
+    main {
+      max-width: 520px;
+      margin: 30px auto;
+    }
+
+    h1 { text-align: center; }
+
+    .panel {
+      background: #222938;
+      padding: 24px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+    }
+
+    .settings {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #cbd5e1;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px 4px;
+      background: #111827;
+      color: white;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    #rollButton {
+      width: 100%;
+      margin-top: 24px;
+      background: #38bdf8;
+      color: #082f49;
+    }
+
+    #rollButton:hover { background: #7dd3fc; }
+
+    .result {
+      text-align: center;
+      margin-top: 24px;
+    }
+
+    #formula { color: #94a3b8; }
+
+    #total {
+      font-size: 64px;
+      font-weight: bold;
+      margin: 12px 0;
+    }
+
+    #diceResults {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .die {
+      min-width: 44px;
+      padding: 12px;
+      background: #334155;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    #copyButton {
+      margin-top: 20px;
+      background: #475569;
+      color: white;
+    }
+
+    #copyButton:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #475569;
+      overflow-wrap: anywhere;
+    }
+
+    .history-item:last-child { border-bottom: none; }
+
+    .history-item span { color: #cbd5e1; }
+
+    .history-item strong { flex-shrink: 0; }
+
+    #clearButton {
+      background: transparent;
+      color: #94a3b8;
+      padding: 4px 8px;
+      font-size: 13px;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    @media (max-width: 400px) {
+      body { padding: 12px; }
+      .panel { padding: 16px; }
+      .settings { gap: 6px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>🎲 Dice Roller</h1>
+
+    <section class="panel">
+      <div class="settings">
+        <div>
+          <label for="sides">ダイス</label>
+          <select id="sides">
+            <option value="4">D4</option>
+            <option value="6" selected>D6</option>
+            <option value="8">D8</option>
+            <option value="10">D10</option>
+            <option value="12">D12</option>
+            <option value="20">D20</option>
+            <option value="100">D100</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="count">個数</label>
+          <select id="count"></select>
+        </div>
+
+        <div>
+          <label for="modifier">補正値</label>
+          <select id="modifier"></select>
+        </div>
+      </div>
+
+      <button id="rollButton">🎲 ダイスを振る！</button>
+
+      <div class="result" aria-live="polite">
+        <div id="formula">ダイスを振ってください</div>
+        <div id="total">—</div>
+        <div id="diceResults"></div>
+        <button id="copyButton" disabled>結果をコピー</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="history-header">
+        <h2>履歴</h2>
+        <button id="clearButton">履歴を消去</button>
+      </div>
+      <div id="history">まだ履歴はありません</div>
+    </section>
+  </main>
+
+  <script>
+    "use strict";
+
+    const sidesSelect = document.getElementById("sides");
+    const countSelect = document.getElementById("count");
+    const modifierSelect = document.getElementById("modifier");
+    const formulaElement = document.getElementById("formula");
+    const totalElement = document.getElementById("total");
+    const diceResultsElement = document.getElementById("diceResults");
+    const historyElement = document.getElementById("history");
+    const copyButton = document.getElementById("copyButton");
+
+    const history = [];
+    let latestResult = "";
+
+    // 個数の選択肢を作成
+    for (let i = 1; i <= 10; i++) {
+      const option = new Option(i, i);
+      countSelect.add(option);
+    }
+
+    // 補正値の選択肢を作成
+    for (let i = -10; i <= 10; i++) {
+      const label = i > 0 ? `+${i}` : String(i);
+      const option = new Option(label, i);
+      modifierSelect.add(option);
+    }
+
+    countSelect.value = "1";
+    modifierSelect.value = "0";
+
+    // 偏りを避けて暗号学的乱数から整数を生成
+    function randomInt(max) {
+      const range = 0x100000000;
+      const limit = Math.floor(range / max) * max;
+      const values = new Uint32Array(1);
+
+      let value;
+      do {
+        crypto.getRandomValues(values);
+        value = values[0];
+      } while (value >= limit);
+
+      return (value % max) + 1;
+    }
+
+    function makeFormula(count, sides, modifier) {
+      let formula = `${count}D${sides}`;
+
+      if (modifier > 0) formula += `+${modifier}`;
+      if (modifier < 0) formula += modifier;
+
+      return formula;
+    }
+
+    function rollDice() {
+      const sides = Number(sidesSelect.value);
+      const count = Number(countSelect.value);
+      const modifier = Number(modifierSelect.value);
+
+      const results = [];
+
+      for (let i = 0; i < count; i++) {
+        results.push(randomInt(sides));
+      }
+
+      const total = results.reduce((sum, n) => sum + n, 0)
+        + modifier;
+
+      const formula = makeFormula(count, sides, modifier);
+
+      formulaElement.textContent = formula;
+      totalElement.textContent = total;
+      diceResultsElement.replaceChildren();
+
+      for (const value of results) {
+        const die = document.createElement("span");
+        die.className = "die";
+        die.textContent = value;
+        diceResultsElement.appendChild(die);
+      }
+
+      latestResult =
+        `${formula} → [${results.join(", ")}] 合計: ${total}`;
+
+      copyButton.disabled = false;
+
+      history.unshift({
+        formula,
+        results,
+        total
+      });
+
+      if (history.length > 10) history.pop();
+
+      renderHistory();
+    }
+
+    function renderHistory() {
+      historyElement.replaceChildren();
+
+      if (history.length === 0) {
+        historyElement.textContent = "まだ履歴はありません";
+        return;
+      }
+
+      for (const entry of history) {
+        const row = document.createElement("div");
+        row.className = "history-item";
+
+        const detail = document.createElement("span");
+        detail.textContent =
+          `${entry.formula} → [${entry.results.join(", ")}]`;
+
+        const total = document.createElement("strong");
+        total.textContent = entry.total;
+
+        row.append(detail, total);
+        historyElement.appendChild(row);
+      }
+    }
+
+    async function copyResult() {
+      if (!latestResult) return;
+
+      try {
+        await navigator.clipboard.writeText(latestResult);
+        copyButton.textContent = "コピーしました！";
+      } catch (error) {
+        copyButton.textContent = "コピー失敗";
+        console.error("コピーに失敗:", error);
+      }
+
+      setTimeout(() => {
+        copyButton.textContent = "結果をコピー";
+      }, 1500);
+    }
+
+    document.getElementById("rollButton")
+      .addEventListener("click", rollDice);
+
+    copyButton.addEventListener("click", copyResult);
+
+    document.getElementById("clearButton")
+      .addEventListener("click", () => {
+        history.length = 0;
+        renderHistory();
+      });
+  </script>
+</body>
+</html>
