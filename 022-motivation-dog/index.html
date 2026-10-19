@@ -1,0 +1,248 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Motivation Dog 🐶</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background: #fff5df;
+      font-family: "Yu Gothic", "Meiryo", sans-serif;
+      color: #5b4636;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+      padding: 36px 24px;
+      background: white;
+      border-radius: 24px;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(100, 70, 30, 0.1);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 28px;
+    }
+
+    .description {
+      font-size: 14px;
+      color: #8b7765;
+      line-height: 1.8;
+    }
+
+    .dog-button {
+      display: block;
+      margin: 24px auto 12px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 24px;
+      background: transparent;
+      font-size: 110px;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .dog-button:hover {
+      transform: scale(1.08);
+    }
+
+    .dog-button:active {
+      transform: scale(0.94);
+    }
+
+    .dog-button:focus-visible {
+      outline: 3px solid #d49b58;
+      outline-offset: 4px;
+    }
+
+    .hint {
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: #9b8570;
+    }
+
+    .message {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 125px;
+      padding: 24px;
+      border-radius: 18px;
+      background: #fff7e8;
+      font-size: 19px;
+      font-weight: bold;
+      line-height: 1.9;
+      white-space: pre-line;
+    }
+
+    .footer {
+      margin-top: 24px;
+      font-size: 12px;
+      color: #ad9985;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 28px 16px;
+      }
+
+      .dog-button {
+        font-size: 90px;
+      }
+
+      .message {
+        font-size: 17px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>🐾 Motivation Dog</h1>
+    <p class="description">
+      やる気が出ない日もあるワン。<br>
+      とりあえず犬を撫でてみるワン。
+    </p>
+
+    <button
+      id="dogButton"
+      class="dog-button"
+      type="button"
+      aria-label="犬を撫でてメッセージを表示"
+    >🐶</button>
+
+    <p class="hint">↑ 犬をクリックするワン！</p>
+
+    <div id="message" class="message" aria-live="polite">
+      今日は何をするワン？<br>
+      何もしないのもありだワン。
+    </div>
+
+    <p class="footer">
+      がんばる日も、休む日も、犬は犬だワン。
+    </p>
+  </main>
+
+  <script>
+    // 励ましの言葉
+    const encouragement = [
+      "やる気が出るのを待っていたら、日が暮れるワン。まず5分だけやるワン！",
+      "今日は1ミリ進めば勝ちだワン。",
+      "とりあえず始めてみるワン。嫌なら途中でやめてもいいワン。",
+      "完璧じゃなくても、完成すれば立派だワン！",
+      "小さな一歩も、積み重ねれば遠くへ行けるワン。",
+      "昨日の自分と競争する必要はないワン。今日は今日のペースだワン。",
+      "やる気がなくても、手だけ動かしてみるワン。",
+      "10分やってみるワン。10分後のことは10分後に考えるワン。",
+      "失敗しても経験値は入るワン。ゲームみたいなものだワン！",
+      "できることから始めればいいワン。順番なんて自由だワン。",
+      "やる気ゼロでも、準備だけならできるかもしれないワン。",
+      "今日の小さな挑戦が、未来の自分を助けるかもしれないワン。",
+      "最初の一歩が一番重いワン。犬が背中を押すワン！",
+      "難しいことは小さく分けるワン。一口ずつ食べるワン。",
+      "今日も新しいことを試せるワン。それだけで面白いワン！"
+    ];
+
+    // 名言風のオリジナルメッセージ
+    const wisdom = [
+      "千里の道も一歩からだワン。犬は四歩ずつ歩くワン！",
+      "昨日の失敗は、今日の説明書になるワン。",
+      "遠回りも、歩いた距離には違いないワン。",
+      "才能があるかどうかは、続けてから考えるワン。",
+      "未来はまだ書かれていないワン。好きに落書きするワン！",
+      "結果が出ない時間も、根っこは育っているかもしれないワン。",
+      "大きな目標も、今日の一歩からできているワン。",
+      "何も知らないことは、何でも学べるということだワン。",
+      "失敗を恐れて何もしないより、失敗して笑うのも面白いワン。",
+      "昨日の常識が、明日の非常識になることもあるワン。",
+      "続けることと、休むことは矛盾しないワン。",
+      "人生の正解は、最後まで分からないかもしれないワン。",
+      "他人の速度で走る必要はないワン。犬にも歩幅があるワン。",
+      "今日の自分が未完成なのは、まだ続きがあるからだワン。",
+      "何になるか分からない努力にも、面白さはあるワン。"
+    ];
+
+    // 休息を勧める言葉
+    const rest = [
+      "今日は休むワン。明日も世界は残っているワン。",
+      "疲れているなら寝るワン。犬もそうするワン。",
+      "やる気が出ないのは、休みたい合図かもしれないワン。",
+      "今日はもう十分かもしれないワン。お茶でも飲むワン。",
+      "休むことも、長く続けるための作戦だワン。",
+      "何もしない午後があってもいいワン。",
+      "今日の仕事はここまでだワン。閉店ガラガラだワン。",
+      "疲れた脳みそには、難しいことを考えさせないワン。",
+      "頑張る日と休む日、両方あって人生だワン。",
+      "今日は布団が呼んでいるワン。犬にも聞こえるワン。",
+      "一日休んだからといって、積み上げたものは消えないワン。",
+      "今は充電中だワン。充電中のスマホを責める人はいないワン。",
+      "休憩したら、少し違う景色が見えるかもしれないワン。",
+      "今日は最低限だけで十分だワン。あとは自由時間だワン。",
+      "やる気を出すことまで頑張らなくていいワン。"
+    ];
+
+    // ユーモアのある言葉
+    const humor = [
+      "犬も今日は何もしたくないワン。お互い大変ワンな。",
+      "やる気を探していたら、おやつを見つけたワン。",
+      "犬には夢があるワン。毎日おいしいご飯を食べることだワン。",
+      "やる気が行方不明だワン。警察に届けるワン？",
+      "人生は短いワン。でも昼寝には十分な長さだワン。",
+      "犬は毎日同じ散歩道でも楽しいワン。才能かもしれないワン。",
+      "今日はやる気がないワン？ 犬もないワン。奇遇だワン！",
+      "頑張ろうと思ったけど、肉球がかわいいので眺めているワン。",
+      "やる気スイッチを探したけど、犬にはついていなかったワン。",
+      "犬はプログラミングできないワン。でもバグを見つけたら吠えるワン。",
+      "人生にセーブ機能があればいいワン。とりあえず昼寝するワン。",
+      "世界征服は明日にするワン。今日は散歩が忙しいワン。",
+      "犬の仕事はかわいいことだワン。今日も勤務中だワン。",
+      "やる気がないなら犬を撫でるワン。犬のやる気は出るワン。",
+      "今日は何もしない選手権に出場するワン。強敵は猫だワン。"
+    ];
+
+    // すべてのメッセージをまとめる
+    const messages = [
+      ...encouragement,
+      ...wisdom,
+      ...rest,
+      ...humor
+    ];
+
+    let previousIndex = -1;
+
+    function showMessage() {
+      let randomIndex;
+
+      // 直前と同じメッセージを避ける
+      do {
+        randomIndex = Math.floor(Math.random() * messages.length);
+      } while (
+        messages.length > 1 &&
+        randomIndex === previousIndex
+      );
+
+      previousIndex = randomIndex;
+
+      document.getElementById("message").textContent =
+        messages[randomIndex];
+    }
+
+    document.getElementById("dogButton")
+      .addEventListener("click", showMessage);
+  </script>
+</body>
+</html>
