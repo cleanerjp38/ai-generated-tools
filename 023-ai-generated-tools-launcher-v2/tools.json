@@ -1,0 +1,25 @@
+{
+  "tools": [
+    {
+      "id": "012",
+      "name": "Idea Backlog Manager",
+      "type": "python-gui",
+      "path": "012-idea-backlog-manager/main.py",
+      "description": "開発アイデアを管理する"
+    },
+    {
+      "id": "021",
+      "name": "Dice Roller Web",
+      "type": "web",
+      "path": "021-dice-roller-web/index.html",
+      "description": "ダイスを振る"
+    },
+    {
+      "id": "022",
+      "name": "Motivation Dog",
+      "type": "web",
+      "path": "022-motivation-dog/index.html",
+      "description": "犬に励ましてもらう"
+    }
+  ]
+}
